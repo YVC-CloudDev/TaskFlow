@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TaskFlow - ניהול משימות</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .add-task {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        input {
+            width: 70%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-right: 5px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .delete-btn {
+            background-color: #f44336;
+        }
+        .complete-btn {
+            background-color: #2196F3;
+        }
+        .task-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .completed {
+            text-decoration: line-through;
+            color: #888;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .pending { background-color: #fff3cd; }
+        .done { background-color: #d4edda; }
+    </style>
+</head>
+<body>
+    <h1>✅ TaskFlow</h1>
+    <h3 style="text-align:center; color:#666;">ניהול משימות בענן</h3>
+
+    <div class="add-task">
+        <input type="text" id="taskInput" placeholder="כתוב משימה חדשה..." />
+        <button onclick="addTask()">➕ הוסף משימה</button>
+    </div>
+
+    <div id="tasksList"></div>
+
+    <script>
+        const API_URL = 'YOUR_API_URL';
+
+        async function loadTasks() {
+            try {
+                const response = await fetch(`${API_URL}/tasks`);
+                const data = await response.json();
+                displayTasks(data.tasks);
+            } catch (error) {
+                console.error('שגיאה בטעינת משימות:', error);
+            }
+        }
+
+        function displayTasks(tasks) {
+            const tasksList = document.getElementById('tasksList');
+            tasksList.innerHTML = '';
+            
+            if (tasks.length === 0) {
+                tasksList.innerHTML = '<p style="text-align:center; color:#888;">אין משימות עדיין — הוסף משימה חדשה!</p>';
+                return;
+            }
+
+            tasks.forEach(task => {
+                const div = document.createElement('div');
+                div.className = 'task-item';
+                div.innerHTML = `
+                    <span class="${task.status === 'done' ? 'completed' : ''}">
+                        ${task.taskName}
+                    </span>
+                    <span class="status ${task.status}">
+                        ${task.status === 'done' ? '✅ הושלם' : '⏳ ממתין'}
+                    </span>
+                    <div>
+                        <button class="complete-btn" onclick="updateTask('${task.taskId}', 'done')">✔ סיים</button>
+                        <button class="delete-btn" onclick="deleteTask('${task.taskId}')">🗑 מחק</button>
+                    </div>
+                `;
+                tasksList.appendChild(div);
+            });
+        }
+
+        async function addTask() {
+            const input = document.getElementById('taskInput');
+            const taskName = input.value.trim();
+            
+            if (!taskName) {
+                alert('אנא כתוב שם משימה!');
+                return;
+            }
+
+            try {
+                await fetch(`${API_URL}/tasks`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({taskName})
+                });
+                input.value = '';
+                loadTasks();
+            } catch (error) {
+                console.error('שגיאה ביצירת משימה:', error);
+            }
+        }
+
+        async function updateTask(taskId, status) {
+            try {
+                await fetch(`${API_URL}/tasks/${taskId}`, {
+                    method: 'PUT',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({status})
+                });
+                loadTasks();
+            } catch (error) {
+                console.error('שגיאה בעדכון משימה:', error);
+            }
+        }
+
+        async function deleteTask(taskId) {
+            try {
+                await fetch(`${API_URL}/tasks/${taskId}`, {
+                    method: 'DELETE'
+                });
+                loadTasks();
+            } catch (error) {
+                console.error('שגיאה במחיקת משימה:', error);
+            }
+        }
+
+        loadTasks();
+    </script>
+</body>
+</html>
