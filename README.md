@@ -1,2 +1,43 @@
-# TaskFlow
-Serverless Task Management App on AWS
+# TaskFlow 🗂️
+A Serverless Task Management Application built on AWS.
+
+## Live Application
+🔗 http://taskflow-frontend-485944704403.s3-website-us-east-1.amazonaws.com
+
+## Team Members
+- [Maysam habshy] - [212680599 :ת"ז]
+- [radyeh mousa] - [ת"ז: 212793954]
+- [Tasneem bakli] - [ת"ז : 325488716]
+
+## Architecture
+- **Frontend:** S3 + CloudFront
+- **API:** API Gateway
+- **Backend:** AWS Lambda (Python)
+- **Database:** DynamoDB
+- **Monitoring:** CloudWatch
+- **CI/CD:** GitHub Actions
+
+## Features
+- ✅ Create new tasks
+- ✅ View all tasks
+- ✅ Mark tasks as completed
+- ✅ Delete tasks
+
+## AWS Services Used
+- Amazon S3
+- Amazon CloudFront
+- Amazon API Gateway
+- AWS Lambda
+- Amazon DynamoDB
+- Amazon CloudWatch
+- AWS IAM
+- Amazon Route 53
+- AWS Certificate Manager
+
+## CI/CD
+Automated deployment using GitHub Actions:
+- Frontend deployed to S3
+- Backend deployed to AWS Lambda
+
+## Repository
+🔗 https://github.com/maysamha51-creator/TaskFlow
