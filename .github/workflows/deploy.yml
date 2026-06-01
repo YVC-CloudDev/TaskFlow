@@ -1,0 +1,63 @@
+name: Deploy TaskFlow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-frontend:
+    name: Deploy Frontend to S3
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy to S3
+        run: |
+          aws s3 sync frontend/ s3://taskflow-frontend-485944704403 --delete
+
+  deploy-backend:
+    name: Deploy Backend to Lambda
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Deploy create_task
+        run: |
+          cd backend/create_task
+          zip -r function.zip lambda_function.py
+          aws lambda update-function-code --function-name taskflow-create-task --zip-file fileb://function.zip
+
+      - name: Deploy get_tasks
+        run: |
+          cd backend/get_tasks
+          zip -r function.zip lambda_function.py
+          aws lambda update-function-code --function-name taskflow-get-tasks --zip-file fileb://function.zip
+
+      - name: Deploy update_task
+        run: |
+          cd backend/update_task
+          zip -r function.zip lambda_function.py
+          aws lambda update-function-code --function-name taskflow-update-task --zip-file fileb://function.zip
+
+      - name: Deploy delete_task
+        run: |
+          cd backend/delete_task
+          zip -r function.zip lambda_function.py
+          aws lambda update-function-code --function-name taskflow-delete-task --zip-file fileb://function.zip
