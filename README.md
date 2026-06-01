@@ -40,4 +40,4 @@ Automated deployment using GitHub Actions:
 - Backend deployed to AWS Lambda
 
 ## Repository
-🔗 https://github.com/maysamha51-creator/TaskFlow
+🔗 https://github.com/maysamha51-creator/Img-Shrink
