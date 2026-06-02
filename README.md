@@ -2,11 +2,10 @@
 A Serverless Task Management Application built on AWS.
 
 ## Live Application
-🔗 http://taskflow-frontend-485944704403.s3-website-us-east-1.amazonaws.com
-
+🔗https://taskflow2.proj.rotem.click
 ## Team Members
 - [Maysam habshy] - [212680599 :ת"ז]
-- [radyeh mousa] - [ת"ז: 212793954]
+- [radyeh moussa] - [ת"ז: 212793954]
 - [Tasneem bakli] - [ת"ז : 325488716]
 
 ## Architecture
@@ -42,4 +41,3 @@ Automated deployment using GitHub Actions:
 ## Repository
 🔗 https://github.com/YVC-CloudDev/TaskFlow
 
-+++

@@ -1,176 +1,386 @@
 <!DOCTYPE html>
 <html lang="he" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskFlow - ניהול משימות</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
-        }
-        h1 {
-            color: #333;
-            text-align: center;
-        }
-        .add-task {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        input {
-            width: 70%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
-        }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-            margin-right: 5px;
-        }
-        button:hover {
-            background-color: #45a049;
-        }
-        .delete-btn {
-            background-color: #f44336;
-        }
-        .complete-btn {
-            background-color: #2196F3;
-        }
-        .task-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .completed {
-            text-decoration: line-through;
-            color: #888;
-        }
-        .status {
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 14px;
-        }
-        .pending { background-color: #fff3cd; }
-        .done { background-color: #d4edda; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TaskFlow — ניהול משימות</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0d0f14;
+      --surface: #151820;
+      --surface2: #1c2030;
+      --border: #252a3a;
+      --accent: #4f8ef7;
+      --accent2: #7c5cfc;
+      --success: #34d399;
+      --danger: #f87171;
+      --warn: #fbbf24;
+      --text: #e8eaf2;
+      --muted: #6b7280;
+      --radius: 12px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Rubik', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    header {
+      padding: 32px 24px 24px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .logo { display: flex; align-items: center; gap: 12px; }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: 'Space Mono', monospace;
+      font-size: 22px; font-weight: 700;
+      letter-spacing: -0.5px; color: var(--text);
+    }
+
+    .logo-sub { font-size: 12px; color: var(--muted); margin-top: 1px; }
+
+    .stats-bar { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .stat-pill {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 99px;
+      padding: 5px 14px; font-size: 12px; color: var(--muted);
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .stat-pill b { font-size: 14px; font-weight: 600; }
+    .stat-pill.blue b  { color: var(--accent); }
+    .stat-pill.green b { color: var(--success); }
+    .stat-pill.yellow b{ color: var(--warn); }
+
+    main { max-width: 720px; margin: 0 auto; padding: 32px 20px 0; }
+
+    .input-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px; margin-bottom: 28px;
+      display: flex; gap: 10px; align-items: center;
+    }
+
+    .input-card input {
+      flex: 1; background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 11px 16px;
+      font-size: 15px; font-family: 'Rubik', sans-serif;
+      color: var(--text); outline: none;
+      transition: border-color 0.2s; direction: rtl;
+    }
+
+    .input-card input::placeholder { color: var(--muted); }
+    .input-card input:focus { border-color: var(--accent); }
+
+    .btn-add {
+      background: var(--accent); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 11px 20px; font-size: 14px;
+      font-family: 'Rubik', sans-serif; font-weight: 500;
+      cursor: pointer; white-space: nowrap;
+      transition: opacity 0.2s, transform 0.1s;
+      display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+    }
+
+    .btn-add:hover  { opacity: 0.88; }
+    .btn-add:active { transform: scale(0.97); }
+
+    .section-label {
+      font-size: 11px; font-family: 'Space Mono', monospace;
+      letter-spacing: 0.12em; color: var(--muted);
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+
+    #tasksList { display: flex; flex-direction: column; gap: 8px; }
+
+    .task-item {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 14px 16px;
+      display: flex; align-items: center; gap: 12px;
+      transition: border-color 0.2s, background 0.2s;
+      animation: slideIn 0.2s ease;
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .task-item:hover { border-color: #353a50; background: #171c28; }
+    .task-item.done-item { opacity: 0.55; }
+
+    .task-check {
+      width: 22px; height: 22px; border-radius: 6px;
+      border: 1.5px solid var(--border); cursor: pointer;
+      flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s, border-color 0.15s;
+      background: transparent; font-size: 13px;
+    }
+
+    .task-check:hover { border-color: var(--success); }
+    .task-check.checked {
+      background: var(--success); border-color: var(--success); color: #fff;
+    }
+
+    .task-name { flex: 1; font-size: 15px; color: var(--text); line-height: 1.4; }
+    .task-name.done-text { text-decoration: line-through; color: var(--muted); }
+
+    .task-meta { display: flex; align-items: center; gap: 8px; }
+
+    .badge {
+      font-size: 11px; padding: 3px 9px;
+      border-radius: 99px; font-weight: 500; white-space: nowrap;
+    }
+
+    .badge-pending { background: #2d2510; color: var(--warn);    border: 1px solid #4a3a12; }
+    .badge-done    { background: #0d2d1e; color: var(--success); border: 1px solid #134a30; }
+
+    .btn-icon {
+      width: 30px; height: 30px; border-radius: 7px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; transition: background 0.15s, color 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+
+    .btn-icon:hover { background: #2d1212; color: var(--danger); border-color: #4a1a1a; }
+
+    .empty { text-align: center; padding: 60px 20px; color: var(--muted); }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+    .empty p { font-size: 15px; }
+
+    .loading {
+      text-align: center; padding: 40px; color: var(--muted);
+      font-size: 14px; display: flex; align-items: center;
+      justify-content: center; gap: 10px;
+    }
+
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--border); border-top-color: var(--accent);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    #toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 20px;
+      font-size: 14px; color: var(--text);
+      transition: transform 0.3s ease; z-index: 100; white-space: nowrap;
+    }
+
+    #toast.show { transform: translateX(-50%) translateY(0); }
+
+    .filters { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+
+    .filter-btn {
+      font-size: 12px; padding: 5px 14px; border-radius: 99px;
+      border: 1px solid var(--border); background: transparent;
+      color: var(--muted); cursor: pointer;
+      font-family: 'Rubik', sans-serif; transition: all 0.15s;
+    }
+
+    .filter-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  </style>
 </head>
 <body>
-    <h1>✅ TaskFlow</h1>
-    <h3 style="text-align:center; color:#666;">ניהול משימות בענן</h3>
 
-    <div class="add-task">
-        <input type="text" id="taskInput" placeholder="כתוב משימה חדשה..." />
-        <button onclick="addTask()">➕ הוסף משימה</button>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">✓</div>
+      <div>
+        <div class="logo-text">TaskFlow</div>
+        <div class="logo-sub">ניהול משימות בענן · AWS Serverless</div>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-pill blue"><b id="stat-total">0</b> סה"כ</div>
+      <div class="stat-pill yellow"><b id="stat-pending">0</b> ממתינות</div>
+      <div class="stat-pill green"><b id="stat-done">0</b> הושלמו</div>
+    </div>
+  </header>
+
+  <main>
+    <div class="input-card">
+      <input type="text" id="taskInput" placeholder="כתוב משימה חדשה ולחץ הוסף..." />
+      <button class="btn-add" onclick="addTask()"><span>+</span> הוסף</button>
     </div>
 
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all', this)">הכל</button>
+      <button class="filter-btn" onclick="setFilter('pending', this)">ממתינות</button>
+      <button class="filter-btn" onclick="setFilter('done', this)">הושלמו</button>
+    </div>
+
+    <div class="section-label" id="tasks-label">משימות</div>
     <div id="tasksList"></div>
+  </main>
 
-    <script>
-        const API_URL = 'https://s0yum054p1.execute-api.us-east-1.amazonaws.com';
+  <div id="toast"></div>
 
-        async function loadTasks() {
-            try {
-                const response = await fetch(`${API_URL}/tasks`);
-                const data = await response.json();
-                displayTasks(data.tasks);
-            } catch (error) {
-                console.error('שגיאה בטעינת משימות:', error);
-            }
-        }
+  <script>
+    const API_URL = 'https://s0yum054p1.execute-api.us-east-1.amazonaws.com';
+    let allTasks = [];
+    let currentFilter = 'all';
 
-        function displayTasks(tasks) {
-            const tasksList = document.getElementById('tasksList');
-            tasksList.innerHTML = '';
-            
-            if (tasks.length === 0) {
-                tasksList.innerHTML = '<p style="text-align:center; color:#888;">אין משימות עדיין — הוסף משימה חדשה!</p>';
-                return;
-            }
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2500);
+    }
 
-            tasks.forEach(task => {
-                const div = document.createElement('div');
-                div.className = 'task-item';
-                div.innerHTML = `
-                    <span class="${task.status === 'done' ? 'completed' : ''}">
-                        ${task.taskName}
-                    </span>
-                    <span class="status ${task.status}">
-                        ${task.status === 'done' ? '✅ הושלם' : '⏳ ממתין'}
-                    </span>
-                    <div>
-                        <button class="complete-btn" onclick="updateTask('${task.taskId}', 'done')">✔ סיים</button>
-                        <button class="delete-btn" onclick="deleteTask('${task.taskId}')">🗑 מחק</button>
-                    </div>
-                `;
-                tasksList.appendChild(div);
-            });
-        }
+    async function loadTasks() {
+      const list = document.getElementById('tasksList');
+      list.innerHTML = '<div class="loading"><div class="spinner"></div> טוען משימות...</div>';
+      try {
+        const res = await fetch(`${API_URL}/tasks`);
+        const data = await res.json();
+        allTasks = data.tasks || [];
+        renderTasks();
+      } catch (e) {
+        list.innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><p>שגיאה בטעינת המשימות</p></div>';
+      }
+    }
 
-        async function addTask() {
-            const input = document.getElementById('taskInput');
-            const taskName = input.value.trim();
-            
-            if (!taskName) {
-                alert('אנא כתוב שם משימה!');
-                return;
-            }
+    function updateStats() {
+      const total = allTasks.length;
+      const done = allTasks.filter(t => t.status === 'done').length;
+      document.getElementById('stat-total').textContent = total;
+      document.getElementById('stat-done').textContent = done;
+      document.getElementById('stat-pending').textContent = total - done;
+    }
 
-            try {
-                await fetch(`${API_URL}/tasks`, {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({taskName})
-                });
-                input.value = '';
-                loadTasks();
-            } catch (error) {
-                console.error('שגיאה ביצירת משימה:', error);
-            }
-        }
+    function setFilter(f, btn) {
+      currentFilter = f;
+      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderTasks();
+    }
 
-        async function updateTask(taskId, status) {
-            try {
-                await fetch(`${API_URL}/tasks/${taskId}`, {
-                    method: 'PUT',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({status})
-                });
-                loadTasks();
-            } catch (error) {
-                console.error('שגיאה בעדכון משימה:', error);
-            }
-        }
+    function renderTasks() {
+      updateStats();
+      const list = document.getElementById('tasksList');
+      const label = document.getElementById('tasks-label');
+      let tasks = allTasks;
+      if (currentFilter === 'pending') tasks = allTasks.filter(t => t.status !== 'done');
+      if (currentFilter === 'done')    tasks = allTasks.filter(t => t.status === 'done');
 
-        async function deleteTask(taskId) {
-            try {
-                await fetch(`${API_URL}/tasks/${taskId}`, {
-                    method: 'DELETE'
-                });
-                loadTasks();
-            } catch (error) {
-                console.error('שגיאה במחיקת משימה:', error);
-            }
-        }
+      label.textContent = `${tasks.length} משימות`;
 
-        loadTasks();
-    </script>
+      if (tasks.length === 0) {
+        list.innerHTML = `<div class="empty">
+          <div class="empty-icon">${currentFilter === 'done' ? '🎯' : '📋'}</div>
+          <p>${currentFilter === 'done' ? 'עדיין אין משימות שהושלמו' : 'אין משימות — הוסיפי אחת!'}</p>
+        </div>`;
+        return;
+      }
+
+      list.innerHTML = '';
+      tasks.forEach(task => {
+        const isDone = task.status === 'done';
+        const div = document.createElement('div');
+        div.className = 'task-item' + (isDone ? ' done-item' : '');
+        div.innerHTML = `
+          <div class="task-check ${isDone ? 'checked' : ''}"
+               onclick="toggleTask('${task.taskId}', '${isDone ? 'pending' : 'done'}')"
+               title="${isDone ? 'סמן כממתין' : 'סמן כהושלם'}">
+            ${isDone ? '✓' : ''}
+          </div>
+          <span class="task-name ${isDone ? 'done-text' : ''}">${escHtml(task.taskName)}</span>
+          <div class="task-meta">
+            <span class="badge ${isDone ? 'badge-done' : 'badge-pending'}">
+              ${isDone ? 'הושלם' : 'ממתין'}
+            </span>
+            <button class="btn-icon" onclick="deleteTask('${task.taskId}')" title="מחק משימה">✕</button>
+          </div>`;
+        list.appendChild(div);
+      });
+    }
+
+    function escHtml(s) {
+      return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    async function addTask() {
+      const input = document.getElementById('taskInput');
+      const taskName = input.value.trim();
+      if (!taskName) { input.focus(); return; }
+      input.disabled = true;
+      try {
+        await fetch(`${API_URL}/tasks`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({taskName})
+        });
+        input.value = '';
+        showToast('✓ משימה נוספה בהצלחה');
+        await loadTasks();
+      } catch(e) {
+        showToast('⚠️ שגיאה בהוספת משימה');
+      }
+      input.disabled = false;
+      input.focus();
+    }
+
+    async function toggleTask(taskId, newStatus) {
+      try {
+        await fetch(`${API_URL}/tasks/${taskId}`, {
+          method: 'PUT',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({status: newStatus})
+        });
+        await loadTasks();
+      } catch(e) {
+        showToast('⚠️ שגיאה בעדכון משימה');
+      }
+    }
+
+    async function deleteTask(taskId) {
+      try {
+        await fetch(`${API_URL}/tasks/${taskId}`, { method: 'DELETE' });
+        showToast('🗑 משימה נמחקה');
+        await loadTasks();
+      } catch(e) {
+        showToast('⚠️ שגיאה במחיקת משימה');
+      }
+    }
+
+    document.getElementById('taskInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') addTask();
+    });
+
+    loadTasks();
+  </script>
 </body>
 </html>
