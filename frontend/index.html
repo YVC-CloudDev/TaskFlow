@@ -3,85 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TaskFlow - ניהול משימות</title>
+    <title>TaskFlow — ניהול משימות</title>
     <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            min-height: 100vh;
+            color: white;
             padding: 20px;
-            background-color: #f5f5f5;
         }
-        h1 {
-            color: #333;
+
+        .header {
             text-align: center;
+            padding: 40px 0 30px;
         }
-        .add-task {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #FF9900, #FFD700);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
         }
-        input {
-            width: 70%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 16px;
+
+        .header p {
+            color: #94A3B8;
+            font-size: 1.1rem;
         }
-        button {
-            padding: 10px 20px;
-            background-color: #4CAF50;
+
+        .badges {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #CBD5E1;
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+        }
+
+        .add-task-card {
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .add-task-card h2 {
+            font-size: 1.1rem;
+            color: #CBD5E1;
+            margin-bottom: 15px;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-row input {
+            flex: 1;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.08);
+            color: white;
+            font-size: 1rem;
+            outline: none;
+            transition: border 0.2s;
+        }
+
+        .input-row input:focus {
+            border-color: #FF9900;
+        }
+
+        .input-row input::placeholder {
+            color: #64748B;
+        }
+
+        .btn-add {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #FF9900, #FF6600);
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 700;
             cursor: pointer;
-            font-size: 16px;
-            margin-right: 5px;
+            transition: transform 0.2s, opacity 0.2s;
+            white-space: nowrap;
         }
-        button:hover {
-            background-color: #45a049;
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
         }
-        .delete-btn {
-            background-color: #f44336;
-        }
-        .complete-btn {
-            background-color: #2196F3;
-        }
-        .task-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+
+        .tasks-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            margin-bottom: 15px;
         }
-        .completed {
+
+        .tasks-header h2 {
+            font-size: 1.2rem;
+            color: #E2E8F0;
+        }
+
+        .tasks-count {
+            background: #FF9900;
+            color: white;
+            padding: 3px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+
+        .task-card {
+            background: rgba(255,255,255,0.07);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 14px;
+            padding: 18px 20px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s, background 0.2s;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .task-card:hover {
+            transform: translateY(-2px);
+            background: rgba(255,255,255,0.1);
+        }
+
+        .task-card.done {
+            border-color: rgba(34,197,94,0.3);
+            background: rgba(34,197,94,0.05);
+        }
+
+        .task-name {
+            flex: 1;
+            font-size: 1rem;
+            color: #E2E8F0;
+        }
+
+        .task-card.done .task-name {
             text-decoration: line-through;
-            color: #888;
+            color: #64748B;
         }
-        .status {
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 14px;
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
-        .pending { background-color: #fff3cd; }
-        .done { background-color: #d4edda; }
+
+        .status-pending {
+            background: rgba(251,191,36,0.2);
+            color: #FBB924;
+            border: 1px solid rgba(251,191,36,0.3);
+        }
+
+        .status-done {
+            background: rgba(34,197,94,0.2);
+            color: #22C55E;
+            border: 1px solid rgba(34,197,94,0.3);
+        }
+
+        .btn-done {
+            padding: 8px 16px;
+            background: rgba(34,197,94,0.2);
+            color: #22C55E;
+            border: 1px solid rgba(34,197,94,0.3);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-done:hover {
+            background: rgba(34,197,94,0.4);
+        }
+
+        .btn-delete {
+            padding: 8px 16px;
+            background: rgba(239,68,68,0.2);
+            color: #EF4444;
+            border: 1px solid rgba(239,68,68,0.3);
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: rgba(239,68,68,0.4);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+            color: #475569;
+        }
+
+        .empty-state div {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 30px;
+            color: #64748B;
+        }
     </style>
 </head>
 <body>
-    <h1>✅ TaskFlow</h1>
-    <h3 style="text-align:center; color:#666;">ניהול משימות בענן</h3>
+    <div class="container">
+        <div class="header">
+            <h1>✅ TaskFlow</h1>
+            <p>ניהול משימות חכם בענן AWS</p>
+            <div class="badges">
+                <span class="badge">S3</span>
+                <span class="badge">Lambda</span>
+                <span class="badge">API Gateway</span>
+                <span class="badge">DynamoDB</span>
+                <span class="badge">CloudFront</span>
+            </div>
+        </div>
 
-    <div class="add-task">
-        <input type="text" id="taskInput" placeholder="כתוב משימה חדשה..." />
-        <button onclick="addTask()">➕ הוסף משימה</button>
+        <div class="add-task-card">
+            <h2>➕ משימה חדשה</h2>
+            <div class="input-row">
+                <input type="text" id="taskInput" placeholder="כתוב את המשימה שלך כאן..." />
+                <button class="btn-add" onclick="addTask()">הוסף משימה</button>
+            </div>
+        </div>
+
+        <div class="tasks-header">
+            <h2>📋 המשימות שלי</h2>
+            <span class="tasks-count" id="tasksCount">0</span>
+        </div>
+
+        <div id="tasksList">
+            <div class="loading">⏳ טוען משימות...</div>
+        </div>
     </div>
-
-    <div id="tasksList"></div>
 
     <script>
         const API_URL = 'https://s0yum054p1.execute-api.us-east-1.amazonaws.com';
@@ -92,33 +283,30 @@
                 const data = await response.json();
                 displayTasks(data.tasks);
             } catch (error) {
-                console.error('שגיאה בטעינת משימות:', error);
+                document.getElementById('tasksList').innerHTML = '<div class="empty-state"><div>⚠️</div><p>שגיאה בטעינת משימות</p></div>';
             }
         }
 
         function displayTasks(tasks) {
             const tasksList = document.getElementById('tasksList');
-            tasksList.innerHTML = '';
-            
+            document.getElementById('tasksCount').textContent = tasks.length;
+
             if (tasks.length === 0) {
-                tasksList.innerHTML = '<p style="text-align:center; color:#888;">אין משימות עדיין — הוסף משימה חדשה!</p>';
+                tasksList.innerHTML = '<div class="empty-state"><div>📭</div><p>אין משימות עדיין — הוסף את המשימה הראשונה שלך!</p></div>';
                 return;
             }
 
+            tasksList.innerHTML = '';
             tasks.forEach(task => {
                 const div = document.createElement('div');
-                div.className = 'task-item';
+                div.className = `task-card ${task.status === 'done' ? 'done' : ''}`;
                 div.innerHTML = `
-                    <span class="${task.status === 'done' ? 'completed' : ''}">
-                        ${task.taskName}
-                    </span>
-                    <span class="status ${task.status}">
+                    <span class="task-name">${task.taskName}</span>
+                    <span class="status-badge ${task.status === 'done' ? 'status-done' : 'status-pending'}">
                         ${task.status === 'done' ? '✅ הושלם' : '⏳ ממתין'}
                     </span>
-                    <div>
-                        <button class="complete-btn" onclick="updateTask('${task.taskId}', 'done')">✔ סיים</button>
-                        <button class="delete-btn" onclick="deleteTask('${task.taskId}')">🗑 מחק</button>
-                    </div>
+                    ${task.status !== 'done' ? `<button class="btn-done" onclick="updateTask('${task.taskId}', 'done')">✔ סיים</button>` : ''}
+                    <button class="btn-delete" onclick="deleteTask('${task.taskId}')">🗑</button>
                 `;
                 tasksList.appendChild(div);
             });
@@ -127,47 +315,34 @@
         async function addTask() {
             const input = document.getElementById('taskInput');
             const taskName = input.value.trim();
-            
-            if (!taskName) {
-                alert('אנא כתוב שם משימה!');
-                return;
-            }
-
+            if (!taskName) { alert('אנא כתוב שם משימה!'); return; }
             try {
                 await fetch(`${API_URL}/tasks`, {
                     method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({taskName})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ taskName })
                 });
                 input.value = '';
                 loadTasks();
-            } catch (error) {
-                console.error('שגיאה ביצירת משימה:', error);
-            }
+            } catch (error) { console.error(error); }
         }
 
         async function updateTask(taskId, status) {
             try {
                 await fetch(`${API_URL}/tasks/${taskId}`, {
                     method: 'PUT',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({status})
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status })
                 });
                 loadTasks();
-            } catch (error) {
-                console.error('שגיאה בעדכון משימה:', error);
-            }
+            } catch (error) { console.error(error); }
         }
 
         async function deleteTask(taskId) {
             try {
-                await fetch(`${API_URL}/tasks/${taskId}`, {
-                    method: 'DELETE'
-                });
+                await fetch(`${API_URL}/tasks/${taskId}`, { method: 'DELETE' });
                 loadTasks();
-            } catch (error) {
-                console.error('שגיאה במחיקת משימה:', error);
-            }
+            } catch (error) { console.error(error); }
         }
 
         loadTasks();
