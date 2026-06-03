@@ -4,15 +4,59 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TaskFlow — ניהול משימות</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            background: #F0FAF4;
             min-height: 100vh;
-            color: white;
+            color: #1A1A1A;
             padding: 20px;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(22,163,74,0.08) 0%, transparent 60%),
+                        radial-gradient(ellipse at 80% 20%, rgba(134,239,172,0.12) 0%, transparent 50%),
+                        radial-gradient(ellipse at 20% 80%, rgba(74,222,128,0.08) 0%, transparent 50%);
+            animation: bgMove 8s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes bgMove {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            100% { transform: translate(3%, 3%) rotate(3deg); }
+        }
+
+        .bubble {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.06;
+            background: #16A34A;
+            animation: float linear infinite;
+            z-index: -1;
+        }
+
+        @keyframes float {
+            0% { transform: translateY(100vh) scale(0); opacity: 0; }
+            10% { opacity: 0.06; }
+            90% { opacity: 0.06; }
+            100% { transform: translateY(-100px) scale(1); opacity: 0; }
+        }
+
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            position: relative;
         }
 
         .header {
@@ -21,54 +65,39 @@
         }
 
         .header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            background: linear-gradient(90deg, #FF9900, #FFD700);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 3.2rem;
+            font-weight: 700;
+            color: #16A34A;
+            margin-bottom: 8px;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 20px rgba(22,163,74,0.2);
         }
 
         .header p {
-            color: #94A3B8;
+            color: #6B7280;
             font-size: 1.1rem;
         }
 
-        .badges {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 15px;
-            flex-wrap: wrap;
-        }
-
-        .badge {
-            background: rgba(255,255,255,0.1);
-            border: 1px solid rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            color: #CBD5E1;
-        }
-
-        .container {
-            max-width: 750px;
-            margin: 0 auto;
-        }
-
         .add-task-card {
-            background: rgba(255,255,255,0.07);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.15);
+            background: white;
+            border: 1px solid #D1FAE5;
             border-radius: 16px;
             padding: 25px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 20px rgba(22,163,74,0.08);
         }
 
         .add-task-card h2 {
             font-size: 1.1rem;
-            color: #CBD5E1;
+            color: #374151;
             margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .add-task-card h2 i {
+            color: #16A34A;
+            margin-left: 8px;
         }
 
         .input-row {
@@ -80,38 +109,74 @@
             flex: 1;
             padding: 14px 18px;
             border-radius: 10px;
-            border: 1px solid rgba(255,255,255,0.2);
-            background: rgba(255,255,255,0.08);
-            color: white;
+            border: 2px solid #D1FAE5;
+            background: #F9FAFB;
+            color: #1A1A1A;
             font-size: 1rem;
             outline: none;
             transition: border 0.2s;
         }
 
         .input-row input:focus {
-            border-color: #FF9900;
+            border-color: #16A34A;
+            background: white;
         }
 
-        .input-row input::placeholder {
-            color: #64748B;
-        }
+        .input-row input::placeholder { color: #9CA3AF; }
 
         .btn-add {
             padding: 14px 24px;
-            background: linear-gradient(135deg, #FF9900, #FF6600);
+            background: #16A34A;
             color: white;
             border: none;
             border-radius: 10px;
             font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: all 0.2s;
             white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-add:hover {
+            background: #15803D;
             transform: translateY(-2px);
-            opacity: 0.9;
+            box-shadow: 0 4px 12px rgba(22,163,74,0.3);
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 8px 20px;
+            border-radius: 20px;
+            border: 2px solid #D1FAE5;
+            background: white;
+            color: #6B7280;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-btn:hover {
+            border-color: #16A34A;
+            color: #16A34A;
+        }
+
+        .filter-btn.active {
+            background: #16A34A;
+            color: white;
+            border-color: #16A34A;
         }
 
         .tasks-header {
@@ -123,11 +188,17 @@
 
         .tasks-header h2 {
             font-size: 1.2rem;
-            color: #E2E8F0;
+            color: #374151;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
+        .tasks-header h2 i { color: #16A34A; }
+
         .tasks-count {
-            background: #FF9900;
+            background: #16A34A;
             color: white;
             padding: 3px 12px;
             border-radius: 20px;
@@ -136,17 +207,17 @@
         }
 
         .task-card {
-            background: rgba(255,255,255,0.07);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255,255,255,0.12);
+            background: white;
+            border: 1px solid #E5E7EB;
             border-radius: 14px;
             padding: 18px 20px;
             margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 15px;
-            transition: transform 0.2s, background 0.2s;
+            transition: all 0.2s;
             animation: slideIn 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         @keyframes slideIn {
@@ -156,23 +227,25 @@
 
         .task-card:hover {
             transform: translateY(-2px);
-            background: rgba(255,255,255,0.1);
+            box-shadow: 0 6px 20px rgba(22,163,74,0.1);
+            border-color: #BBF7D0;
         }
 
         .task-card.done {
-            border-color: rgba(34,197,94,0.3);
-            background: rgba(34,197,94,0.05);
+            border-color: #BBF7D0;
+            background: #F0FDF4;
         }
 
         .task-name {
             flex: 1;
             font-size: 1rem;
-            color: #E2E8F0;
+            color: #1F2937;
+            font-weight: 500;
         }
 
         .task-card.done .task-name {
             text-decoration: line-through;
-            color: #64748B;
+            color: #9CA3AF;
         }
 
         .status-badge {
@@ -180,136 +253,319 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .status-pending {
-            background: rgba(251,191,36,0.2);
-            color: #FBB924;
-            border: 1px solid rgba(251,191,36,0.3);
+            background: #FEF9C3;
+            color: #CA8A04;
+            border: 1px solid #FDE68A;
         }
 
         .status-done {
-            background: rgba(34,197,94,0.2);
-            color: #22C55E;
-            border: 1px solid rgba(34,197,94,0.3);
+            background: #DCFCE7;
+            color: #16A34A;
+            border: 1px solid #BBF7D0;
         }
 
         .btn-done {
             padding: 8px 16px;
-            background: rgba(34,197,94,0.2);
-            color: #22C55E;
-            border: 1px solid rgba(34,197,94,0.3);
+            background: #DCFCE7;
+            color: #16A34A;
+            border: 1px solid #BBF7D0;
             border-radius: 8px;
             font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .btn-done:hover {
-            background: rgba(34,197,94,0.4);
+        .btn-done:hover { background: #16A34A; color: white; }
+
+        .btn-edit {
+            padding: 8px 16px;
+            background: #EFF6FF;
+            color: #3B82F6;
+            border: 1px solid #BFDBFE;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
+
+        .btn-edit:hover { background: #3B82F6; color: white; }
 
         .btn-delete {
             padding: 8px 16px;
-            background: rgba(239,68,68,0.2);
+            background: #FEE2E2;
             color: #EF4444;
-            border: 1px solid rgba(239,68,68,0.3);
+            border: 1px solid #FECACA;
             border-radius: 8px;
             font-size: 0.85rem;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
-        .btn-delete:hover {
-            background: rgba(239,68,68,0.4);
-        }
+        .btn-delete:hover { background: #EF4444; color: white; }
 
         .empty-state {
             text-align: center;
             padding: 50px 20px;
-            color: #475569;
+            color: #9CA3AF;
+            background: white;
+            border-radius: 16px;
+            border: 2px dashed #D1FAE5;
         }
 
-        .empty-state div {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
+        .empty-state i { font-size: 3rem; margin-bottom: 15px; display: block; color: #BBF7D0; }
 
         .loading {
             text-align: center;
             padding: 30px;
-            color: #64748B;
+            color: #9CA3AF;
         }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #9CA3AF;
+            font-size: 0.85rem;
+        }
+
+        /* Modal עדכון */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.show { display: flex; }
+
+        .modal {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+        }
+
+        .modal h3 {
+            font-size: 1.2rem;
+            color: #374151;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .modal h3 i { color: #3B82F6; }
+
+        .modal input {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: 2px solid #BFDBFE;
+            background: #F9FAFB;
+            color: #1A1A1A;
+            font-size: 1rem;
+            outline: none;
+            margin-bottom: 15px;
+        }
+
+        .modal input:focus { border-color: #3B82F6; }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            padding: 10px 20px;
+            background: #F3F4F6;
+            color: #6B7280;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            padding: 10px 20px;
+            background: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-save:hover { background: #2563EB; }
     </style>
 </head>
 <body>
+
+    <div class="bubble" style="width:80px;height:80px;left:10%;animation-duration:12s;animation-delay:0s;"></div>
+    <div class="bubble" style="width:120px;height:120px;left:25%;animation-duration:18s;animation-delay:3s;"></div>
+    <div class="bubble" style="width:60px;height:60px;left:50%;animation-duration:14s;animation-delay:6s;"></div>
+    <div class="bubble" style="width:100px;height:100px;left:70%;animation-duration:20s;animation-delay:1s;"></div>
+    <div class="bubble" style="width:50px;height:50px;left:85%;animation-duration:16s;animation-delay:4s;"></div>
+
+    <!-- Modal עדכון -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <h3><i class="fa-solid fa-pen"></i> עדכן משימה</h3>
+            <input type="text" id="editInput" placeholder="שם המשימה החדש..." />
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeModal()">ביטול</button>
+                <button class="btn-save" onclick="saveEdit()">
+                    <i class="fa-solid fa-floppy-disk"></i> שמור
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div class="header">
-            <h1>✅ TaskFlow</h1>
+            <h1>TaskFlow</h1>
             <p>ניהול משימות חכם בענן AWS</p>
-            <div class="badges">
-                <span class="badge">S3</span>
-                <span class="badge">Lambda</span>
-                <span class="badge">API Gateway</span>
-                <span class="badge">DynamoDB</span>
-                <span class="badge">CloudFront</span>
-            </div>
         </div>
 
         <div class="add-task-card">
-            <h2>➕ משימה חדשה</h2>
+            <h2><i class="fa-solid fa-plus-circle"></i> משימה חדשה</h2>
             <div class="input-row">
                 <input type="text" id="taskInput" placeholder="כתוב את המשימה שלך כאן..." />
-                <button class="btn-add" onclick="addTask()">הוסף משימה</button>
+                <button class="btn-add" onclick="addTask()">
+                    <i class="fa-solid fa-plus"></i> הוסף
+                </button>
             </div>
         </div>
 
+        <div class="filters">
+            <button class="filter-btn active" onclick="setFilter('all', this)">
+                <i class="fa-solid fa-list"></i> הכל
+            </button>
+            <button class="filter-btn" onclick="setFilter('pending', this)">
+                <i class="fa-solid fa-clock"></i> ממתין
+            </button>
+            <button class="filter-btn" onclick="setFilter('done', this)">
+                <i class="fa-solid fa-circle-check"></i> הושלם
+            </button>
+        </div>
+
         <div class="tasks-header">
-            <h2>📋 המשימות שלי</h2>
+            <h2><i class="fa-solid fa-list-check"></i> המשימות שלי</h2>
             <span class="tasks-count" id="tasksCount">0</span>
         </div>
 
         <div id="tasksList">
-            <div class="loading">⏳ טוען משימות...</div>
+            <div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> טוען משימות...</div>
+        </div>
+
+        <div class="footer">
+            <p>TaskFlow © 2026 — Serverless App on AWS</p>
         </div>
     </div>
 
     <script>
         const API_URL = 'https://s0yum054p1.execute-api.us-east-1.amazonaws.com';
+        let allTasks = [];
+        let currentFilter = 'all';
+        let editingTaskId = null;
 
         async function loadTasks() {
             try {
                 const response = await fetch(`${API_URL}/tasks`);
                 const data = await response.json();
-                displayTasks(data.tasks);
+                allTasks = data.tasks;
+                displayTasks();
             } catch (error) {
-                document.getElementById('tasksList').innerHTML = '<div class="empty-state"><div>⚠️</div><p>שגיאה בטעינת משימות</p></div>';
+                document.getElementById('tasksList').innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>שגיאה בטעינת משימות</p></div>';
             }
         }
 
-        function displayTasks(tasks) {
-            const tasksList = document.getElementById('tasksList');
-            document.getElementById('tasksCount').textContent = tasks.length;
+        function setFilter(filter, btn) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            displayTasks();
+        }
 
-            if (tasks.length === 0) {
-                tasksList.innerHTML = '<div class="empty-state"><div>📭</div><p>אין משימות עדיין — הוסף את המשימה הראשונה שלך!</p></div>';
+        function displayTasks() {
+            const tasksList = document.getElementById('tasksList');
+            let filtered = allTasks;
+            if (currentFilter === 'pending') filtered = allTasks.filter(t => t.status !== 'done');
+            if (currentFilter === 'done') filtered = allTasks.filter(t => t.status === 'done');
+            document.getElementById('tasksCount').textContent = filtered.length;
+            if (filtered.length === 0) {
+                tasksList.innerHTML = '<div class="empty-state"><i class="fa-solid fa-inbox"></i><p>אין משימות בקטגוריה זו</p></div>';
                 return;
             }
-
             tasksList.innerHTML = '';
-            tasks.forEach(task => {
+            filtered.forEach(task => {
                 const div = document.createElement('div');
                 div.className = `task-card ${task.status === 'done' ? 'done' : ''}`;
                 div.innerHTML = `
+                    <i class="fa-solid ${task.status === 'done' ? 'fa-circle-check' : 'fa-clock'}"
+                        style="font-size:20px;color:${task.status === 'done' ? '#16A34A' : '#F59E0B'};flex-shrink:0;"></i>
                     <span class="task-name">${task.taskName}</span>
-                    <span class="status-badge ${task.status === 'done' ? 'status-done' : 'status-pending'}">
-                        ${task.status === 'done' ? '✅ הושלם' : '⏳ ממתין'}
-                    </span>
-                    ${task.status !== 'done' ? `<button class="btn-done" onclick="updateTask('${task.taskId}', 'done')">✔ סיים</button>` : ''}
-                    <button class="btn-delete" onclick="deleteTask('${task.taskId}')">🗑</button>
+                    ${task.status !== 'done' ? `<button class="btn-done" onclick="updateTask('${task.taskId}', 'done')"><i class="fa-solid fa-check"></i> סיים</button>` : ''}
+                    <button class="btn-edit" onclick="editTask('${task.taskId}', '${task.taskName}')"><i class="fa-solid fa-pen"></i> עדכן</button>
+                    <button class="btn-delete" onclick="deleteTask('${task.taskId}')"><i class="fa-solid fa-trash"></i> מחק</button>
                 `;
                 tasksList.appendChild(div);
             });
+        }
+
+        function editTask(taskId, currentName) {
+            editingTaskId = taskId;
+            document.getElementById('editInput').value = currentName;
+            document.getElementById('editModal').classList.add('show');
+            document.getElementById('editInput').focus();
+        }
+
+        function closeModal() {
+            editingTaskId = null;
+            document.getElementById('editModal').classList.remove('show');
+        }
+
+        async function saveEdit() {
+            const newName = document.getElementById('editInput').value.trim();
+            if (!newName) { alert('אנא כתוב שם משימה!'); return; }
+            try {
+                await fetch(`${API_URL}/tasks/${editingTaskId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ taskName: newName, status: 'pending' })
+                });
+                closeModal();
+                loadTasks();
+            } catch (error) { console.error(error); }
         }
 
         async function addTask() {
