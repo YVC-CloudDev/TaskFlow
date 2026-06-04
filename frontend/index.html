@@ -146,6 +146,33 @@
             box-shadow: 0 4px 12px rgba(22,163,74,0.3);
         }
 
+        /* ── הודעת שגיאה — משותפת לשני המצבים ── */
+        .error-msg {
+            display: none;
+            align-items: center;
+            gap: 8px;
+            background: #FEE2E2;
+            color: #DC2626;
+            border: 1px solid #FECACA;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-top: 12px;
+            animation: shakeError 0.35s ease;
+        }
+
+        .error-msg.show { display: flex; }
+
+        @keyframes shakeError {
+            0%   { transform: translateX(0); }
+            20%  { transform: translateX(-6px); }
+            40%  { transform: translateX(6px); }
+            60%  { transform: translateX(-4px); }
+            80%  { transform: translateX(4px); }
+            100% { transform: translateX(0); }
+        }
+
         .filters {
             display: flex;
             gap: 10px;
@@ -248,28 +275,6 @@
             color: #9CA3AF;
         }
 
-        .status-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .status-pending {
-            background: #FEF9C3;
-            color: #CA8A04;
-            border: 1px solid #FDE68A;
-        }
-
-        .status-done {
-            background: #DCFCE7;
-            color: #16A34A;
-            border: 1px solid #BBF7D0;
-        }
-
         .btn-done {
             padding: 8px 16px;
             background: #DCFCE7;
@@ -345,7 +350,7 @@
             font-size: 0.85rem;
         }
 
-        /* Modal עדכון */
+        /* ── Modal עדכון ── */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -394,6 +399,11 @@
 
         .modal input:focus { border-color: #3B82F6; }
 
+        .modal .error-msg {
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
         .modal-buttons {
             display: flex;
             gap: 10px;
@@ -441,6 +451,11 @@
         <div class="modal">
             <h3><i class="fa-solid fa-pen"></i> עדכן משימה</h3>
             <input type="text" id="editInput" placeholder="שם המשימה החדש..." />
+            <!-- הודעת שגיאה — מצב עדכון -->
+            <div class="error-msg" id="editError">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span id="editErrorText"></span>
+            </div>
             <div class="modal-buttons">
                 <button class="btn-cancel" onclick="closeModal()">ביטול</button>
                 <button class="btn-save" onclick="saveEdit()">
@@ -463,6 +478,11 @@
                 <button class="btn-add" onclick="addTask()">
                     <i class="fa-solid fa-plus"></i> הוסף
                 </button>
+            </div>
+            <!-- הודעת שגיאה — מצב הוספה -->
+            <div class="error-msg" id="addError">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span id="addErrorText"></span>
             </div>
         </div>
 
@@ -498,6 +518,16 @@
         let currentFilter = 'all';
         let editingTaskId = null;
 
+        function showError(elementId, textElementId, message) {
+            const div = document.getElementById(elementId);
+            document.getElementById(textElementId).textContent = message;
+            div.classList.add('show');
+        }
+
+        function hideError(elementId) {
+            document.getElementById(elementId).classList.remove('show');
+        }
+
         async function loadTasks() {
             try {
                 const response = await fetch(`${API_URL}/tasks`);
@@ -505,7 +535,8 @@
                 allTasks = data.tasks;
                 displayTasks();
             } catch (error) {
-                document.getElementById('tasksList').innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>שגיאה בטעינת משימות</p></div>';
+                document.getElementById('tasksList').innerHTML =
+                    '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation"></i><p>שגיאה בטעינת משימות</p></div>';
             }
         }
 
@@ -542,45 +573,80 @@
             });
         }
 
+        async function addTask() {
+            const input = document.getElementById('taskInput');
+            const taskName = input.value.trim();
+
+            hideError('addError');
+
+            if (!taskName) {
+                showError('addError', 'addErrorText', 'אנא כתוב שם משימה!');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${API_URL}/tasks`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ taskName })
+                });
+                const data = await res.json();
+
+                if (res.status === 409) {
+                    showError('addError', 'addErrorText', data.message);
+                    return;
+                }
+
+                input.value = '';
+                loadTasks();
+            } catch (error) {
+                showError('addError', 'addErrorText', 'שגיאת חיבור, נסי שוב.');
+            }
+        }
+
         function editTask(taskId, currentName) {
             editingTaskId = taskId;
             document.getElementById('editInput').value = currentName;
+            hideError('editError');
             document.getElementById('editModal').classList.add('show');
             document.getElementById('editInput').focus();
         }
 
         function closeModal() {
             editingTaskId = null;
+            document.getElementById('editInput').value = '';
+            hideError('editError');
             document.getElementById('editModal').classList.remove('show');
         }
 
         async function saveEdit() {
             const newName = document.getElementById('editInput').value.trim();
-            if (!newName) { alert('אנא כתוב שם משימה!'); return; }
+
+            hideError('editError');
+
+            if (!newName) {
+                showError('editError', 'editErrorText', 'אנא כתוב שם משימה!');
+                return;
+            }
+
             try {
-                await fetch(`${API_URL}/tasks/${editingTaskId}`, {
+                const res = await fetch(`${API_URL}/tasks/${editingTaskId}`, {
                     method: 'PUT',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ taskName: newName, status: 'pending' })
                 });
+                const data = await res.json();
+
+                if (res.status === 409) {
+                    showError('editError', 'editErrorText', data.message);
+                    return;
+                }
+
                 closeModal();
                 loadTasks();
-            } catch (error) { console.error(error); }
-        }
-
-        async function addTask() {
-            const input = document.getElementById('taskInput');
-            const taskName = input.value.trim();
-            if (!taskName) { alert('אנא כתוב שם משימה!'); return; }
-            try {
-                await fetch(`${API_URL}/tasks`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ taskName })
-                });
-                input.value = '';
-                loadTasks();
-            } catch (error) { console.error(error); }
+            } catch (error) {
+                showError('editError', 'editErrorText', 'שגיאת חיבור, נסי שוב.');
+            }
         }
 
         async function updateTask(taskId, status) {
