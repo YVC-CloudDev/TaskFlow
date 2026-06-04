@@ -11,7 +11,6 @@ def lambda_handler(event, context):
         body = json.loads(event['body'])
         task_name = body['taskName'].strip()
 
-        # ✅ בדיקת שכפול — סריקה לפי שם
         existing = table.scan(
             FilterExpression='taskName = :name',
             ExpressionAttributeValues={':name': task_name}
