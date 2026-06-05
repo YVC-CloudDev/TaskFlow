@@ -666,6 +666,11 @@
                 loadTasks();
             } catch (error) { console.error(error); }
         }
+        document.getElementById('taskInput').addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                addTask();
+            }
+        });
 
         loadTasks();
     </script>
