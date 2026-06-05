@@ -4,9 +4,9 @@ A Serverless Task Management Application built on AWS.
 ## Live Application
 🔗https://taskflow2.proj.rotem.click
 ## Team Members
-- [Maysam habshy] - [212680599 :ת"ז]
-- [radyeh moussa] - [ת"ז: 212793954]
-- [Tasneem bakli] - [ת"ז : 325488716]
+- [Maysam Habashy] - [212680599 :ת"ז]
+- [Radyeh Moussa] - [ת"ז: 212793954]
+- [Tasnim Bakli] - [ת"ז : 325488716]
 
 ## Architecture
 - **Frontend:** S3 + CloudFront
