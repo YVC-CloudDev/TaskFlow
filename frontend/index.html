@@ -661,11 +661,6 @@
         }
         
         async function deleteTask(taskId) {
-            const confirmDelete = confirm('הה?');
-
-            if (!confirmDelete) {
-                return;
-            }
             try {
                 await fetch(`${API_URL}/tasks/${taskId}`, { method: 'DELETE' });
                 loadTasks();
