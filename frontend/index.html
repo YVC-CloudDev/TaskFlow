@@ -464,7 +464,19 @@
             </div>
         </div>
     </div>
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal">
+            <h3><i class="fa-solid fa-trash"></i> מחיקת משימה</h3>
+            <p style="margin-bottom: 20px; color:#4B5563;">
+                האם אתה בטוח שברצונך למחוק את המשימה?
+            </p>
 
+            <div class="modal-buttons">
+                <button class="btn-cancel" onclick="closeDeleteModal()">ביטול</button>
+                <button class="btn-delete" onclick="confirmDeleteTask()">מחק</button>
+            </div>
+        </div>
+    </div>
     <div class="container">
         <div class="header">
             <h1>TaskFlow</h1>
@@ -513,10 +525,12 @@
     </div>
 
     <script>
+
         const API_URL = 'https://s0yum054p1.execute-api.us-east-1.amazonaws.com';
         let allTasks = [];
         let currentFilter = 'all';
         let editingTaskId = null;
+        let deletingTaskId = null;
 
         function showError(elementId, textElementId, message) {
             const div = document.getElementById(elementId);
@@ -660,13 +674,31 @@
             } catch (error) { console.error(error); }
         }
         
-        async function deleteTask(taskId) {
-         
-            try {
-                await fetch(`${API_URL}/tasks/${taskId}`, { method: 'DELETE' });
-                loadTasks();
-            } catch (error) { console.error(error); }
+        function deleteTask(taskId) {
+            deletingTaskId = taskId;
+            document.getElementById('deleteModal').classList.add('show');
         }
+
+        function closeDeleteModal() {
+            deletingTaskId = null;
+            document.getElementById('deleteModal').classList.remove('show');
+        }
+
+        async function confirmDeleteTask() {
+            if (!deletingTaskId) return;
+
+            try {
+                await fetch(`${API_URL}/tasks/${deletingTaskId}`, {
+                    method: 'DELETE'
+                });
+
+                closeDeleteModal();
+                loadTasks();
+
+            } catch (error) {
+                console.error(error);
+            }
+      }
         document.getElementById('taskInput').addEventListener('keydown', function(event) {
             if (event.key === 'Enter') {
                 addTask();
